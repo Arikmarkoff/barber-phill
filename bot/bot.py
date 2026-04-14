@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import pathlib
@@ -38,7 +39,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     conversations[chat_id].append({"role": "user", "content": user_text})
 
-    reply = get_reply(conversations[chat_id])
+    loop = asyncio.get_event_loop()
+    reply = await loop.run_in_executor(None, get_reply, conversations[chat_id])
 
     conversations[chat_id].append({"role": "assistant", "content": reply})
 
@@ -49,7 +51,8 @@ async def _ask_fil(chat_id: int, trigger: str) -> str:
     """Запускает первое сообщение от Фила при /start."""
     prompt = "Начни разговор с новым клиентом — первым, как описано в инструкции."
     conversations[chat_id].append({"role": "user", "content": prompt})
-    reply = get_reply(conversations[chat_id])
+    loop = asyncio.get_event_loop()
+    reply = await loop.run_in_executor(None, get_reply, conversations[chat_id])
     conversations[chat_id].append({"role": "assistant", "content": reply})
     return reply
 

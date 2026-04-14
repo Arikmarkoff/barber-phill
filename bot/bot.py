@@ -60,11 +60,11 @@ async def _ask_fil(chat_id: int, trigger: str) -> str:
 
 def main():
     proxy = os.environ.get("SOCKS5_PROXY")
-    builder = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).read_timeout(60).write_timeout(60).connect_timeout(60)
     if proxy:
-        request = HTTPXRequest(proxy=proxy)
-        builder = builder.request(request)
-    app = builder.build()
+        request = HTTPXRequest(proxy=proxy, read_timeout=60, write_timeout=60, connect_timeout=60)
+        app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).request(request).build()
+    else:
+        app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).read_timeout(60).write_timeout(60).connect_timeout(60).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     logging.info("Бот запущен")
